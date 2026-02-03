@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>3-Hour Survival: A DBMS Adventure</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --panel: #0b0f1a;
+      --text: #eaeaff;
+      --muted: #8b8fb3;
+      --neon-cyan: #00f5ff;
+      --neon-pink: #ff2bdc;
+      --neon-purple: #8b5cf6;
+      --divider: #1f2340;
+    }
+
+    body {
+      margin: 0;
+      padding: 3rem 1.5rem;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(0,245,255,0.08), transparent 35%),
+        linear-gradient(180deg, #05060a, #070814);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: auto;
+    }
+
+    a {
+      color: var(--neon-cyan);
+      text-decoration: none;
+    }
+
+    .top-nav {
+      margin-bottom: 3rem;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      opacity: 0.85;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.6rem;
+      margin-bottom: 0.4rem;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 12px rgba(0,245,255,0.6);
+    }
+
+    .author {
+      color: var(--neon-pink);
+      font-size: 0.85rem;
+      margin-bottom: 3rem;
+      letter-spacing: 1px;
+    }
+
+    h2 {
+      margin-top: 4rem;
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-purple);
+      text-shadow: 0 0 8px rgba(139,92,246,0.6);
+    }
+
+    h3 {
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      font-size: 1.15rem;
+      color: var(--neon-cyan);
+    }
+
+    p {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      margin-bottom: 1.4rem;
+    }
+
+    em {
+      color: var(--neon-pink);
+    }
+
+    strong {
+      color: #ffffff;
+    }
+
+    blockquote {
+      background: linear-gradient(
+        90deg,
+        rgba(0,245,255,0.18),
+        rgba(255,43,220,0.05)
+      );
+      border-left: 3px solid var(--neon-cyan);
+      padding: 1.2rem 1.4rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: #e0faff;
+      box-shadow: 0 0 20px rgba(0,245,255,0.15);
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--neon-cyan),
+        transparent
+      );
+      margin: 4rem 0;
+    }
+
+    .bottom-nav {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .bottom-nav a {
+      padding: 0.6rem 1.4rem;
+      border-radius: 6px;
+      background: var(--panel);
+      border: 1px solid var(--divider);
+      box-shadow: 0 0 12px rgba(0,245,255,0.15);
+    }
+
+    .bottom-nav a:hover {
+      box-shadow: 0 0 20px rgba(255,43,220,0.5);
+      border-color: var(--neon-pink);
+    }
+
+    footer {
+      margin-top: 4rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+    }
+    .skate-wrapper.anime {
+  position: fixed;
+  bottom: 35px;
+  left: -260px;
+  width: 260px;
+  pointer-events: none;
+  z-index: 3;
+
+  animation: skate-move 14s linear infinite;
+}
+
+
+.anime-skater {
+  width: 240px;
+  height: auto;
+  fill: none;
+  stroke: #00f5ff;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  filter:
+    drop-shadow(0 0 6px #00f5ff)
+    drop-shadow(0 0 14px #ff3ad7)
+    drop-shadow(0 0 28px rgba(255, 58, 215, 0.4));
+
+  animation:
+    anime-bob 1.4s ease-in-out infinite,
+    neon-pulse 3s ease-in-out infinite;
+}
+
+
+/* Smooth glide across screen */
+@keyframes skate-move {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100vw + 300px));
+  }
+}
+
+/* Anime floating motion */
+@keyframes anime-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Neon breathing glow */
+@keyframes neon-pulse {
+  0%, 100% {
+    stroke: #00f5ff;
+  }
+  50% {
+    stroke: #ff3ad7;
+  }
+}
+
+
+  </style>
+</head>
+
+<body><canvas id="skater"></canvas>
+
+<div class="skate-wrapper anime">
+  <svg class="anime-skater" viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg">
+    
+    <!-- Head -->
+    <circle cx="150" cy="30" r="11" />
+
+    <!-- Hair (anime flow) -->
+    <path d="M138 28 Q150 10 165 28 Q170 45 150 50 Q130 45 138 28" />
+
+    <!-- Body -->
+    <path d="M150 42 Q145 70 140 90" />
+    <path d="M150 42 Q160 65 168 88" />
+
+    <!-- Legs -->
+    <path d="M140 90 Q120 105 115 120" />
+    <path d="M168 88 Q170 105 185 118" />
+
+    <!-- Arms -->
+    <path d="M148 55 Q120 65 105 75" />
+    <path d="M152 55 Q175 60 195 70" />
+
+    <!-- Skateboard -->
+    <rect x="95" y="120" width="120" height="6" rx="4" />
+    <circle cx="110" cy="130" r="4" />
+    <circle cx="200" cy="130" r="4" />
+
+  </svg>
+</div>
+
+  <div class="container">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <a href="sanweb.html">← San’s Story Lab</a>
+    </div>
+
+    <!-- Title -->
+    <h1>3-Hour Survival: A DBMS Adventure</h1>
+    <div class="author">By San</div>
+
+    
+<h2 color:blue>*3-Hour Survival: A DBMS Adventure**</h2>
+
+ 
+
+*<p>By San </p>
+
+
+---
+
+
+<h3>**Intro:**</h3><p>
+
+
+What happens when a three-hour DBMS lecture hits harder than any survival show?</p><p>
+
+No breaks (well, one tiny snack window), no escape, just your team, a map, and seven confusing-yet-crucial steps to make it through.</p><p>
+
+This isn't just a class—this is *survival*.
+</p><p>
+Inspired by a real lecture, this is my twist on how we faced the ultimate challenge: **converting an ER diagram into relational form.**</p><p>
+
+
+Let the survival begin.....</p>
+
+
+<h3>## **"The Survival Class" – Part One**</h3>
+
+
+<h4>*A DBMS-inspired fictional tale*
+</h4>
+
+---
+
+
+<p>**Today, we had a bunch of students sitting in a so-called “survival class”…**</p><p>
+
+
+You’re probably wondering:</p>
+
+<p>What even *is* a survival class?</p>
+
+<p>Why is it **three hours** long?</p><p>
+
+Why did the students attend it so seriously?</p><p>
+
+
+Let’s rewind a bit.</p>
+
+
+---
+
+
+<h3>### **Before the Class…**</h3>
+
+
+<p>A mysterious company launched a “real survival” challenge. No games. No simulations. The experience had to feel genuine.</p>
+
+
+<p>Those who registered were required to attend a *three-hour class*. The condition?</p>
+
+<p>**Without attending the class, they wouldn’t survive—or even step into—the survival zone.**</p>
+
+
+<p>Back to the present…</p>
+
+
+---
+
+
+<h3>### **The Class Begins**</h3><p>
+
+
+As the students gathered, the teacher entered the room, carrying a mysterious aura and a glowing presentation.</p>
+
+
+<p>She began:</p>
+
+
+> <p>“Hello students. This three-hour class is crucial. I hope you’ll take it seriously.</p>
+
+> <p>As you see on this screen—this is your map. Study it carefully. You won’t get to see it again.”</p>
+
+
+<p>And just like that, the tension rose.</p>
+
+
+---
+
+
+<h3>### **The Seven Steps of Survival Structuring**</h3>
+
+
+> <p>“You’ll need to convert this vague map into structured information.</p>
+
+> <p>Confused? Good. That’s why you’re here.”</p>
+
+
+> <p>“We’ll go through **seven steps** to make sense of this chaos. There will be a **10–20 minute break** in the middle. Bring snacks now—there will be no time later.”</p>
+
+
+---
+
+
+<h3>### **Step 1: Identify the Strong Spots**</h3>
+
+
+<p>“These are zones where direct challenges await—but you also gain the most. Mark them wisely from the map.”</p>
+
+
+<p>Teams started jotting down the danger zones. Sharp eyes scanned every inch. Silence fell.</p>
+
+
+---
+
+
+<h3>### **Step 2: Locate the Weak Spots**</h3>
+
+
+<p>“These seem harmless. Easy to pass through. But remember—**they might hide something.**”</p>
+
+
+> <p>“Here's a clue: strong spots always have **unique keys**. Weak ones? They might *look* like they do… but don’t fall for it.”</p>
+
+
+<p>*Trust nothing. Observe everything.*</p>
+
+
+---
+
+
+<h3>### **Step 3: Multi-Resource Zones**</h3>
+
+
+> <p>“Some places give you **multiple resources** at once.</p>
+
+> <p>Prioritize these—they save time, effort, and mistakes.”</p>
+
+
+<p>Teams began tagging areas with clusters. They started building their lists.</p>
+
+
+---
+
+
+<h3>### **Step 4: The Main Spot**</h3>
+
+
+<p>A student raised a hand:</p>
+
+<p>**“Why is it called the main spot?”**</p>
+
+<p>
+> “Because,” the teacher answered, “it connects *three or more* zones—strong and weak—and links them through shared traits.</p>
+
+><p> It's the *heart* of your structure.”</p>
+
+
+<p>Eyes widened. The center of the map started making sense.</p>
+
+
+---
+
+
+<h3>### **Break Time**</h3>
+
+
+<p>The teacher paused.</p>
+
+
+> <p>“Let’s take a break.”</p>
+
+
+<p>The students, heads spinning with maps and steps, left for a breather.</p>
+
+
+<p>“Fresh air, finally,” someone whispered.</p>
+
+<p>“But what *is* this show?” another muttered.</p>
+
+<p>No one knew.</p>
+
+
+<p>After 20 minutes, they returned. The lights dimmed. The screen lit up again.</p>
+
+
+---
+
+
+<h3>## **Now\... Let the Competition Begin**
+</h3>
+
+> <p>“Until now,” the teacher said, “you’ve been working **individually as teams**.
+
+> From this point on—you **compete**.”</p>
+
+
+<p>Murmurs. Glances exchanged. Tension rose.</p>
+
+
+---
+
+
+<h3>### **Step 5: Many for Many**</h3>
+
+
+><p> “Find spots where **many resources serve many purposes**.</p><p>
+
+> List them *clearly*. You won’t return to search again.”</p>
+
+<p>
+> “Bonus: some of these have hidden perks. Add them if found.”</p>
+
+<p>
+Click-clack. Pens scratched paper faster than ever.</p><p>
+
+
+---
+
+
+### **Step 6: Split or Fight – The Resource Trade**</p><p>
+
+
+> “Now it gets tricky,” the teacher said. “This step has *mystery*.”</p><p>
+
+
+> “Sometimes, one resource is shared by all.</p><p>
+
+> Other times, one team gets *many* resources at once.</p><p>
+
+> This is the **1-to-many** or **many-to-1** scenario.”</p><p>
+
+
+> “To survive here, you **trade keys** from earlier. But beware—”</p><p>
+
+
+* *If you get many in a 1-to-many, keep your key—don’t abandon it. It becomes a foreign item if you do.*
+</p><p>
+* *If you’re in a many-to-1, add your key. It will now act as a foreign key to the resource.*</p>
+
+
+<p>Everyone blinked. Some smirked, realizing the metaphor.</p><p>
+
+
+This wasn’t just a class. It was a **relational battle**.</p>
+
+
+---
+
+
+<h3>### **Step 7: The Final Clash – One to One**</h3><p>
+
+
+> “This is the last step. Teams will now face off in **one-on-one duels**.”</p><p>
+
+
+The screen showed a voting grid.</p><p>
+
+
+> “Each team votes for the other. Audience votes count too.”</p>
+
+
+> <p>“Whichever team gets **more votes** earns a **resource** from the team with lower or partial votes.”</p>
+
+
+> <p>“And that new resource? It’s marked with a **foreign key**—because it wasn’t originally yours.”</p>
+
+
+<p>Students stared. The stakes felt… real.</p>
+
+
+---
+
+
+<h3>### **The End... or the Beginning?**
+</h3><p>
+
+The teacher looked across the room. Quiet now.
+</p><p>
+
+> “That’s all. Our three-hour survival class ends here.”</p><p>
+
+
+She smiled gently.</p>
+
+
+> <p>“Hope you got it. Because next…”</p>
+
+
+<p>A pause.</p>
+
+
+><p> “…comes the **real survival**.”
+</p><p>
+
+She packed up and walked to the door.</p>
+
+
+> <p>“You’ll soon be split into **three levels**, based on your resource collection.</p><p>
+
+> There… you’ll fight in teams.
+</p><p>
+> With everything you’ve learned here.”</p>
+
+
+<p>The door clicked shut.</p><p>
+
+
+A whisper echoed:</p><p>
+
+
+> “This was our survival class…”</p>
+
+<p>
+Another voice followed:</p><p>
+
+
+> “Now for the *real* survival…”</p>
+
+
+---
+
+
+<h3>## **See You All in Part Two.**</h3>
+
+
+<p>And just like that, our survival class ended—with keys traded, alliances formed, and the mysterious "foreign key" leaving its mark.</p>
+
+<p>But hey, the real challenge is yet to come...
+</p>
+
+<p>See you in **Part Two: Real Survival Begins** 🔥</p>
+
+<p>Until then, keep your resources close, your teammates closer, and never underestimate a DBMS class again.</p>
+
+<p>Stay tuned. Stay sane. Stay curiousps to make it through.</p><p>
+
+
+
+
+
+
+
+
+    <hr>
+
+    <div class="bottom-nav">
+      <a href="index.html">← Previous</a>
+    </div>
+
+    <footer>
+      — San
+    </footer>
+
+  </div>
+
+</body>
+</html>
+
